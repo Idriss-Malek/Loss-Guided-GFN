@@ -1,12 +1,12 @@
 
-# TorchGFN
+# Instructions
  
 ## Installation
  
 To install the required dependencies, run:
  
 ```bash
-
+git clone https://github.com/sharmaabhijith/torchgfn/tree/dag_gfn
 
 cd torchgfn
 
