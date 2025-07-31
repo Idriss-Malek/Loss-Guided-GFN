@@ -1,11 +1,9 @@
 import torch
 from tqdm import tqdm
-
+import wandb
 
 from gfn.env import Env
 from gfn.gflownet import TBGFlowNet
-
-
 
 
 def train_tb(
@@ -18,7 +16,7 @@ def train_tb(
     device_str: str = "cpu",
 ):
     """
-    Train a siblings augmented GFlowNet.
+    Train a TB GFlowNet.
 
     Args:
         env: The environment to train on.
@@ -39,13 +37,14 @@ def train_tb(
     main_non_logz_params = [
         v for k, v in dict(mainGFN.named_parameters()).items() if k != "logZ"
     ]
+
     mainOptimizer = torch.optim.Adam(main_non_logz_params, lr=lr)
     logz_params = [dict(mainGFN.named_parameters())["logZ"]]
     mainOptimizer.add_param_group({"params": logz_params, "lr": lr_Z})
 
+    loss_history = []
 
-
-    for _ in tqdm(range(iterations)):
+    for step in tqdm(range(iterations)):
 
         mainTrajectories = mainGFN.sample_trajectories(
             env=env, n=batch_size, save_logprobs=True
@@ -57,4 +56,22 @@ def train_tb(
         )
         mainLoss.backward()
         mainOptimizer.step()
+
+        loss_history.append(mainLoss.item())
+
+        wandb.log({
+        "main_loss": mainLoss.item(),
+        "iteration": step
+        })
+        
+
+    return loss_history
+
+
+    
+
+
+        
+
+
 

@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-
+import wandb
 
 from gfn.env import Env
 from gfn.gflownet import TBGFlowNet
@@ -19,7 +19,7 @@ def train_lggfn(
     device_str: str = "cpu",
 ):
     """
-    Train a siblings augmented GFlowNet.
+    Train a loss guided GFlowNet.
 
     Args:
         env: The environment to train on.
@@ -52,8 +52,11 @@ def train_lggfn(
     auxlogz_params = [dict(auxGFN.named_parameters())["logZ"]]
     auxOptimizer.add_param_group({"params": auxlogz_params, "lr": lr_Z})
 
+    main_loss_history = []
+    aux_loss_history = []
 
-    for _ in tqdm(range(iterations)):
+
+    for step in tqdm(range(iterations)):
         auxTrajectories = auxGFN.sample_trajectories(
             env=env, n=batch_size, save_logprobs=True
         )
@@ -63,18 +66,17 @@ def train_lggfn(
         mainOptimizer.zero_grad()
         auxOptimizer.zero_grad()
 
-
         mainAuxLoss = mainGFN.loss(
             env, auxTrajectories, recalculate_all_logprobs=True, reduction="none"
         )
         updated_log_rewards = torch.logsumexp(torch.stack([torch.log(lamda * mainAuxLoss.detach()), auxTrajectories.log_rewards], dim=0), dim=0) #type: ignore
-
         mainMainLoss = mainGFN.loss(
             env, mainTrajectories, recalculate_all_logprobs=False, reduction="none"
         )
         mainLoss = torch.cat([mainAuxLoss[: batch_size//2], mainMainLoss]).mean()
         mainLoss.backward()
         mainOptimizer.step()
+
         auxLoss = auxGFN.loss(
             env,
             auxTrajectories,
@@ -83,3 +85,14 @@ def train_lggfn(
         )
         auxLoss.backward()
         auxOptimizer.step()
+
+        main_loss_history.append(mainLoss.item())
+        aux_loss_history.append(auxLoss.item())
+
+        wandb.log({
+        "main_loss": mainLoss.item(),
+        "aux_loss": auxLoss.item(),
+        "iteration": step
+        })
+
+    return main_loss_history, aux_loss_history

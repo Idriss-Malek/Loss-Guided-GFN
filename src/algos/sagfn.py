@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
-
+import wandb
 
 from gfn.env import Env
 from gfn.utils.modules import MLP
@@ -65,7 +65,13 @@ def train_sagfn(
         param.requires_grad = False
 
     rndOptimizer = torch.optim.Adam(rnd_train.parameters(), lr=lr_rnd)
-    for _ in tqdm(range(iterations)):
+
+    main_loss_history = []
+    aux_loss_history = []
+
+
+    for step in tqdm(range(iterations)):
+        
         auxTrajectories = auxGFN.sample_trajectories(
             env=env, n=batch_size, save_logprobs=True
         )
@@ -103,3 +109,14 @@ def train_sagfn(
         auxOptimizer.step()
         rnd_loss.mean().backward()
         rndOptimizer.step()
+
+        main_loss_history.append(mainLoss.item())
+        aux_loss_history.append(auxLoss.item())
+
+        wandb.log({
+        "main_loss": mainLoss.item(),
+        "aux_loss": auxLoss.item(),
+        "iteration": step
+        })
+
+    return main_loss_history, aux_loss_history

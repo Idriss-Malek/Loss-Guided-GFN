@@ -1,0 +1,131 @@
+_wandb:
+    value:
+        cli_version: 0.19.11
+        m:
+            - "1": reward
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": iteration
+              "6":
+                - 3
+              "7": []
+            - "1": gc
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": mfe
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": cai
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": loss
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+        python_version: 3.10.16
+        t:
+            "1":
+                - 1
+                - 11
+                - 49
+                - 55
+                - 77
+                - 100
+                - 105
+            "2":
+                - 1
+                - 11
+                - 49
+                - 55
+                - 77
+                - 100
+                - 105
+            "3":
+                - 2
+                - 7
+                - 13
+                - 16
+                - 23
+                - 55
+            "4": 3.10.16
+            "5": 0.19.11
+            "6": 4.51.3
+            "8":
+                - 5
+            "12": 0.19.11
+            "13": linux-x86_64
+algo:
+    value: sagfn
+batch_size:
+    value: 16
+beta_e:
+    value: 1
+beta_i:
+    value: 1
+beta_sn:
+    value: 1
+clip_grad_norm:
+    value: 1
+config_path:
+    value: /home/ubuntu/aya/Loss-Guided-GFN/src/envs/Bio_env/config.yaml
+device:
+    value: cuda
+embedding_dim:
+    value: 32
+epsilon:
+    value: 0.1
+hidden_dim:
+    value: 256
+lamda:
+    value: 1
+lr:
+    value: 0.01
+lr_logz:
+    value: 0.1
+lr_patience:
+    value: 10
+n_hidden:
+    value: 2
+n_iterations:
+    value: 20
+n_samples:
+    value: 10
+natural_mRNA_seq:
+    value: AUGACCAGCAUGACUCAGUCUCUGCGGGAGGUGAUAAAGGCCAUGACCAAGGCUCGCAAUUUUGAGAGAGUUUUGGGAAAGAUUACUCUUGUCUCUGCUGCUCCUGGGAAAGUGAUUUGUGAAAUGAAAGUAGAAGAAGAGCAUACCAAUGCAAUAGGCACUCUCCACGGCGGUUUGACAGCCACGUUAGUAGAUAACAUAUCAACAAUGGCUCUGCUAUGCACGGAAAGGGGAGCACCCGGAGUCAGUGUCGAUAUGAACAUAACGUACAUGUCACCUGCAAAAUUAGGAGAAGAUAUAGUGAUUACAGCACAUGUUCUGAAGCAAGGAAAAACACUUGCAUUUACCUCUGUGGAUCUGACCAACAAGGCCACAGGAAAAUUAAUAGCACAAGGAAGACACACAAAACACCUGGGAAACUGA
+no_cuda:
+    value: false
+protein_seq:
+    value: MTSMTQSLREVIKAMTKARNFERVLGKITLVSAAPGKVICEMKVEEEHTNAIGTLHGGLTATLVDNISTMALLCTERGAPGVSVDMNITYMSPAKLGEDIVITAHVLKQGKTLAFTSVDLTNKATGKLIAQGRHTKHLGN*
+reward_scale:
+    value: 1
+reward_weights:
+    value:
+        - 0.3
+        - 0.3
+        - 0.4
+rnd_lr:
+    value: 0.001
+run_name:
+    value: NM_018473-HomoSapiens-Protein
+seed:
+    value: 42
+tied:
+    value: false
+top_n:
+    value: 50
+wandb_project:
+    value: mRNA-LGGFN-Medium-Sequence

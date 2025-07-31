@@ -24,8 +24,6 @@ def main(args):
         trunk=mainPF.trunk,
     )
 
-
-
     mainPF_estimator = DiscretePolicyEstimator(
         mainPF, env.n_actions, is_backward=False, preprocessor=preprocessor
     )
@@ -97,9 +95,10 @@ def main(args):
     plot_distribution(mainGFN.pf, env)
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser()
 
-    ################ Hypergrid Environment ################
+    ################ Hypergrid Environment ###############
     parser.add_argument('--height', type=int, default=32)
     parser.add_argument('--ndim', type=int, default=2)
     parser.add_argument('--R0', type=float,default=1e-4)
@@ -124,7 +123,6 @@ if __name__ == "__main__":
     ################## LGGFN Hyperparameters #############
     parser.add_argument('--lamda', type=float, default=1.0)
 
-
-
     args = parser.parse_args()
+    main(args)
 
