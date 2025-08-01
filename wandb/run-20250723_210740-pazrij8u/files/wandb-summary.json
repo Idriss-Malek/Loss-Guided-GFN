@@ -1,1 +1,0 @@
-{"unique_sequences":100,"inference_time":1324.4467453956604,"train_time":1065.5480840206146,"_runtime":2390.710631425,"_timestamp":1.7533072514451764e+09,"eval_mean_cai":0.4258458614349365,"eval_mean_gc":42.40898513793945,"eval_mean_mfe":-149.03500366210938,"_step":0,"_wandb":{"runtime":2390}}
