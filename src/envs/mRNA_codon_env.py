@@ -6,7 +6,7 @@ from gfn.actions import Actions
 from gfn.states import DiscreteStates
 from gfn.env import DiscreteEnv
 
-from utils import *
+from examples.mRNA_design_utils.utils import *
 
 # --- mRNA Design Environment ---
 class CodonDesignEnv(DiscreteEnv):
@@ -16,7 +16,7 @@ class CodonDesignEnv(DiscreteEnv):
     Dynamic masks restrict actions at each step:
     - At step t < seq_length: only synonymous codons for protein_seq[t] are allowed.
     - At step t == seq_length: only the exit action is allowed.
-    
+
     """
 
     def __init__(
@@ -26,7 +26,7 @@ class CodonDesignEnv(DiscreteEnv):
         sf=None,
         ):
 
-        self._device = device 
+        self._device = device
         self.protein_seq = protein_seq
         self.seq_length = len(protein_seq)
 
@@ -49,7 +49,7 @@ class CodonDesignEnv(DiscreteEnv):
         super().__init__(
             n_actions=self.n_actions,
             s0=s0,
-            state_shape = (self.seq_length,),    
+            state_shape = (self.seq_length,),
             action_shape=(1,), # Each action is a single index
             sf=sf,
         )
@@ -70,14 +70,14 @@ class CodonDesignEnv(DiscreteEnv):
 
 
     def step(self,
-            states, 
+            states,
             actions: Actions,
-        ) ->  DiscreteStates:   
-            
+        ) ->  DiscreteStates:
+
         states_tensor = states.tensor.to(self._device)
         batch_size = states_tensor.shape[0]
         current_length = (states_tensor!= -1).sum(dim=1)
-    
+
         max_length = states_tensor.shape[1]
         new_states = states_tensor.clone()
         valid_actions = actions.tensor.squeeze(-1)
@@ -94,16 +94,16 @@ class CodonDesignEnv(DiscreteEnv):
         states,
         actions: Actions,
     ) -> DiscreteStates:
-        
+
         states_tensor = states.tensor
         batch_size, seq_len = states_tensor.shape
         current_length = (states_tensor != -1).sum(dim=1)
         new_states = states_tensor.clone()
-        
+
         for i in range(batch_size):
             if current_length[i] > 0:
-                new_states[i, current_length[i]-1] = -1 
-                       
+                new_states[i, current_length[i]-1] = -1
+
         return self.States(new_states)
 
 
@@ -113,11 +113,11 @@ class CodonDesignEnv(DiscreteEnv):
         batch_size = states_tensor.shape[0]
         current_length = (states_tensor != -1).sum(dim=1)
 
-        forward_masks = torch.zeros((batch_size, self.n_actions), 
+        forward_masks = torch.zeros((batch_size, self.n_actions),
                                    dtype=torch.bool, device=self._device)
-        backward_masks = torch.zeros((batch_size, self.n_actions - 1), 
+        backward_masks = torch.zeros((batch_size, self.n_actions - 1),
                                     dtype=torch.bool, device=self._device)
-  
+
         for i in range(batch_size):
 
             cl = current_length[i].item()
@@ -145,45 +145,45 @@ class CodonDesignEnv(DiscreteEnv):
 
         states_tensor = states.tensor
         batch_size = states_tensor.shape[0]
-        
+
         gc_percents = []
         mfe_energies = []
         cai_scores = []
-        
+
         # Process each sequence individually
         for i in range(batch_size):
 
             seq_indices = states_tensor[i]
 
             # Compute GC content
-            gc_percent = compute_gc_content_vectorized(seq_indices, codon_gc_counts=self.codon_gc_counts)                               
+            gc_percent = compute_gc_content_vectorized(seq_indices, codon_gc_counts=self.codon_gc_counts)
             gc_percents.append(gc_percent)
-            
+
             # Compute MFE
             mfe_energy = compute_mfe_energy(seq_indices)
             mfe_energies.append(mfe_energy)
-            
+
             # Compute CAI
             cai_score = compute_cai(seq_indices)
             cai_scores.append(cai_score)
-        
+
         device = states_tensor.device
 
         gc_percent = torch.tensor(gc_percents, device=device, dtype=torch.float32)
         mfe_energy = torch.tensor(mfe_energies, device=device, dtype=torch.float32)
         cai_score = torch.tensor(cai_scores, device=device, dtype=torch.float32)
-        
+
         # Calculate weighted reward
         reward_components = torch.stack([gc_percent, -mfe_energy, cai_score], dim=-1)
         reward = (reward_components * self.weights.to(device)).sum(dim=-1)
-        
+
         return reward
 
     def is_terminal(self, states: DiscreteStates) -> torch.Tensor:
         states_tensor = states.tensor
         current_length = (states_tensor != -1).sum(dim=1)
         return (current_length >= self.seq_length).bool()
-    
+
     @staticmethod
     def make_sink_states_tensor(shape, device=None):
         return torch.zeros(shape, dtype=torch.long, device=device)
