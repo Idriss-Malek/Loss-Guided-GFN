@@ -2,6 +2,7 @@ import argparse
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
+print(sys.path[-1])
 
 from datetime import datetime
 import yaml
@@ -22,7 +23,7 @@ from gfn.states import States
 from gfn.preprocessors import Preprocessor
 
 from src.gflownet import TBGFlowNetV2
-from src.algos import train_tb, train_lggfn, train_sagfn
+from src.algos import train_tb, train_lggfn, train_sagfn, train_subtb
 
 from torchgfn.src.gfn.samplers import Sampler
 from mRNA_design_utils.evaluate import evaluate
@@ -110,6 +111,9 @@ def main(args, config):
     if args.algo == "tb":
         history = train_tb(env, mainGFN, batch_size=args.batch_size, iterations=args.n_iterations, lr=args.lr,
                            lr_Z=args.lr_logz, device_str=str(device))
+    if args.algo == "subtb":
+        history = train_subtb(env, mainGFN, batch_size=args.batch_size, iterations=args.n_iterations, lr=args.lr,
+                              device_str=str(device))
     elif args.algo == "lggfn":
         history = train_lggfn(env, mainGFN, auxGFN, batch_size=args.batch_size, iterations=args.n_iterations,
                               lamda=args.lamda, lr=args.lr, lr_Z=args.lr_logz, device_str=str(device))
@@ -209,7 +213,7 @@ if __name__ == "__main__":
     setup_logging()
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--algo", choices=["tb","lggfn","sagfn"], default="tb")
+    parser.add_argument("--algo", choices=["tb","lggfn","sagfn","subtb"], default="subtb")
 
     parser.add_argument("--no_cuda", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
