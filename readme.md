@@ -6,7 +6,7 @@
 To install the required dependencies, run:
  
 ```bash
-git clone https://github.com/sharmaabhijith/torchgfn/tree/dag_gfn
+git clone --branch dag_gfn --single-branch https://github.com/sharmaabhijith/torchgfn.git
 
 cd torchgfn
 
