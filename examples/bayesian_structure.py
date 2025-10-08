@@ -296,6 +296,18 @@ def main(args: Namespace):
             lr_Z=args.lr_Z,
             device_str=args.device_str
         )
+    elif args.algo == "AT":
+        train_lggfn(
+            env=env,
+            mainGFN=mainGFN,
+            auxGFN=auxGFN,
+            batch_size=args.batch_size,
+            iterations=args.iterations,
+            lamda=args.lamda,
+            lr=args.lr,
+            lr_Z=args.lr_Z,
+            device_str=args.device_str
+        )
     elif args.algo == "sagfn":
         train_sagfn(
             env=env,
