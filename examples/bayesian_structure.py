@@ -11,7 +11,7 @@ from torch_geometric.data import Batch as GeometricBatch
 from gfn.utils.common import set_seed
 
 
-from src.algos import train_tb, train_lggfn, train_sagfn
+from src.algos import train_tb, train_lggfn, train_sagfn, train_AT
 from src.gflownet import TBGFlowNetV2
 from gfn.gym.helpers.bayesian_structure.factories import get_scorer
 from gfn.gym.bayesian_structure import BayesianStructure
@@ -155,7 +155,8 @@ class DAGEdgeActionGNN(GraphEdgeActionGNN):
 def main(args: Namespace):
     seed = args.seed if args.seed != 0 else DEFAULT_SEED
     set_seed(seed)
-    device = "cuda" if torch.cuda.is_available() and args.use_cuda else "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(device)
 
     rng = np.random.default_rng(seed)  # This should be cpu
 
@@ -297,7 +298,7 @@ def main(args: Namespace):
             device_str=args.device_str
         )
     elif args.algo == "AT":
-        train_lggfn(
+        train_AT(
             env=env,
             mainGFN=mainGFN,
             auxGFN=auxGFN,
@@ -392,7 +393,7 @@ if __name__ == "__main__":
     parser.add_argument("--lr_Z", type=float, default=1.0)
     parser.add_argument("--iterations", type=int, default=1000)
     parser.add_argument("--batch_size", type=int, default=256)
-    parser.add_argument('--algo', type=str, default="tb", choices=["tb", "lggfn", "sagfn"])
+    parser.add_argument('--algo', type=str, default="tb", choices=["tb", "lggfn", "sagfn", "AT"])
     parser.add_argument('--device_str', type=str, default="cpu")
 
     # SAGFN parameters
